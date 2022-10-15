@@ -1,0 +1,33 @@
+.background-image {
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    display: block;
+    background-image: url('https://robbreport.com/wp-content/uploads/2020/07/6-3.jpg?w=1000');
+    width: 100vw;
+    height: 100vh;
+    -webkit-filter: blur(18px);
+    -moz-filter: blur(18px);
+    -o-filter: blur(18px);
+    -ms-filter: blur(18px);
+    filter: blur(18px);
+
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.content {
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+p {
+    width: 70%;
+}
