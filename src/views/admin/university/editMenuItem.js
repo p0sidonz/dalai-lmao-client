@@ -40,6 +40,7 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import ShowLoader from 'ui-component/custom/Loader';
 
 // third party
 import * as Yup from 'yup';
@@ -50,7 +51,7 @@ import AddNewFood from '../food/AddNewFood';
 const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
     const dispatch = useDispatch();
     const [itemModalOpen, setItemModalOpen, toggleModal] = useModal();
-
+    const [isLoaderLoading, setIsLoaderLoading] = useState(false);
     const theme = useTheme();
     const [isLoading, setIsLoading] = useState(true);
     const [menuImage, setMenuImage] = useState(menuEditItem.image);
@@ -110,6 +111,7 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
     };
 
     const handleOnChange = async (event, value, reason, details) => {
+        setIsLoaderLoading(true);
         // console.log(details, value);
         // setExistingData([...existingData, details.option]);
         if (reason === 'selectOption') {
@@ -120,6 +122,7 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
                     food_id: details.option.id
                 })
                 .then((r) => {
+                    setIsLoaderLoading(false);
                     dispatch(
                         openSnackbar({
                             open: true,
@@ -134,6 +137,7 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
                     toggleEditModal();
                 })
                 .catch((err) => {
+                    setIsLoaderLoading(false);
                     dispatch(
                         openSnackbar({
                             open: true,
@@ -166,6 +170,7 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
                             close: true
                         })
                     );
+                    setIsLoaderLoading(false);
                     toggleEditModal();
                 })
                 .catch((err) => {
@@ -180,6 +185,7 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
                             close: true
                         })
                     );
+                    setIsLoaderLoading(false);
                 });
         }
     };
@@ -195,6 +201,8 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
 
     return (
         <>
+            <ShowLoader isLoading={isLoaderLoading} />
+
             <Grid container spacing={3} justifyContent="center" alignItems="center">
                 <Grid item xs={12}>
                     <Formik
@@ -211,6 +219,7 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
                             image: Yup.mixed().required()
                         })}
                         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
+                            setIsLoaderLoading(true);
                             console.log({ ...values, image: menuImage });
                             await axiosServices
                                 .post('/university-menu/update', { ...values, image: menuImage })
@@ -227,10 +236,12 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
                                             close: true
                                         })
                                     );
+                                    setIsLoaderLoading(false);
                                     toggleEditModal();
                                     fetchMenus();
                                 })
                                 .catch((err) => {
+                                    setIsLoaderLoading(false);
                                     console.log(err);
                                     dispatch(
                                         openSnackbar({
@@ -362,49 +373,6 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
 
                                 {!isLoading ? (
                                     <>
-                                        {/* <Autocomplete
-                                            disabled={Boolean(!dateValue)}
-                                            multiple={true}
-                                            value={existingData}
-                                            getOptionSelected={(option, value) => value.name === option.name}
-                                            id="checkboxes-tags-demo"
-                                            options={foodList}
-                                            getOptionLabel={(option) => option.name}
-                                            name="foodlist"
-                                            onChange={handleOnChange}
-                                            disableCloseOnSelect={true}
-                                            renderTags={(value, getTagProps) =>
-                                                value.map((option, index) => (
-                                                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
-                                                ))
-                                            }
-                                            renderInput={(params) => <TextField {...params} label="Search Food" placeholder="Favorites" />}
-                                        />{' '} */}
-                                        {/* <Autocomplete
-                                            id="combo-box-demo"
-                                            multiple
-                                            disableCloseOnSelect
-                                            value={existingData}
-                                            options={foodList}
-                                            getOptionSelected={(option, value) => value.name === option.name}
-                                            getOptionLabel={(option) => option.name}
-                                            style={{ width: 500 }}
-                                            renderInput={(params) => (
-                                                <TextField {...params} label="Combo box" variant="outlined" fullWidth />
-                                            )}
-                                            renderOption={(option, { selected }) => (
-                                                <>
-                                                    <Checkbox
-                                                        icon={icon}
-                                                        checkedIcon={checkedIcon}
-                                                        style={{ marginRight: 8 }}
-                                                        checked={selected}
-                                                    />
-                                                    {option.text}
-                                                </>
-                                            )}
-                                        /> */}
-
                                         <Autocomplete
                                             disabled={Boolean(!dateValue)}
                                             id="combo-box-demo"

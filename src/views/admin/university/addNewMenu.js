@@ -6,9 +6,8 @@ import { useParams, Link } from 'react-router-dom';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useDispatch } from 'react-redux';
 // project imports
-import { gridSpacing } from 'store/constant';
-import useAuth from 'hooks/useAuth';
-import MainCard from 'ui-component/cards/MainCard';
+import ShowLoader from 'ui-component/custom/Loader';
+
 import {
     Box,
     Avatar,
@@ -30,8 +29,9 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 import axiosServices from 'utils/axios';
 
-const AddNewMenu = ({ universityId }) => {
-    console.log(universityId);
+const AddNewMenu = ({ universityId, refetch, setItemModalOpen }) => {
+    const [isLoading, setIsLoading] = useState(Boolean(false));
+
     const dispatch = useDispatch();
     const theme = useTheme();
     const [menuImage, setMenuImage] = useState('');
@@ -56,6 +56,8 @@ const AddNewMenu = ({ universityId }) => {
 
     return (
         <>
+            <ShowLoader isLoading={isLoading} />
+
             <Grid container spacing={3} justifyContent="center" alignItems="center">
                 <Grid item xs={12}>
                     <Formik
@@ -71,11 +73,13 @@ const AddNewMenu = ({ universityId }) => {
                             image: Yup.mixed().required()
                         })}
                         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
+                            setIsLoading(true);
                             delete values.image;
                             await axiosServices
                                 .post('/university-menu/', { ...values, image: menuImage })
                                 .then((r) => {
                                     console.log(r);
+                                    refetch();
                                     dispatch(
                                         openSnackbar({
                                             open: true,
@@ -87,6 +91,8 @@ const AddNewMenu = ({ universityId }) => {
                                             close: true
                                         })
                                     );
+                                    setItemModalOpen();
+                                    setIsLoading(false);
                                 })
                                 .catch((err) => {
                                     console.log(err);
@@ -101,6 +107,7 @@ const AddNewMenu = ({ universityId }) => {
                                             close: true
                                         })
                                     );
+                                    setIsLoading(false);
                                 });
                         }}
                     >

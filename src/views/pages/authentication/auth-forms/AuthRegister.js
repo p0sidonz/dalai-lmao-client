@@ -20,7 +20,8 @@ import {
     Typography,
     useMediaQuery,
     Select,
-    MenuItem
+    MenuItem,
+    Backdrop
 } from '@mui/material';
 
 // third party
@@ -33,7 +34,7 @@ import useAuth from 'hooks/useAuth';
 import useScriptRef from 'hooks/useScriptRef';
 import { strengthColor, strengthIndicatorNumFunc } from 'utils/password-strength';
 import { openSnackbar } from 'store/slices/snackbar';
-
+import ShowLoader from 'ui-component/custom/Loader';
 // assets
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -46,7 +47,7 @@ const JWTRegister = ({ ...others }) => {
     const navigate = useNavigate();
     const scriptedRef = useScriptRef();
     const dispatch = useDispatch();
-
+    const [isLoading, setIsLoading] = React.useState(Boolean(false));
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     const [showPassword, setShowPassword] = React.useState(false);
     const [checked, setChecked] = React.useState(true);
@@ -102,6 +103,8 @@ const JWTRegister = ({ ...others }) => {
 
     return (
         <>
+            <ShowLoader isLoading={isLoading} />
+
             <Grid container direction="column" justifyContent="center" spacing={2}>
                 <Grid item xs={12} container alignItems="center" justifyContent="center">
                     <Box sx={{ mb: 2 }}>
@@ -125,7 +128,7 @@ const JWTRegister = ({ ...others }) => {
                     university: Yup.string().max(255).required('university is required')
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
-                    console.log(values);
+                    setIsLoading(true);
                     try {
                         await register({ ...values });
                         if (scriptedRef.current) {
@@ -142,10 +145,8 @@ const JWTRegister = ({ ...others }) => {
                                     close: false
                                 })
                             );
-
-                            setTimeout(() => {
-                                navigate('/login', { replace: true });
-                            }, 1500);
+                            navigate('/login', { replace: true });
+                            setIsLoading(false);
                         }
                     } catch (err) {
                         console.error(err);
@@ -153,6 +154,7 @@ const JWTRegister = ({ ...others }) => {
                             setStatus({ success: false });
                             setErrors({ submit: err.message });
                             setSubmitting(false);
+                            setIsLoading(false);
                         }
                     }
                 }}

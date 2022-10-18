@@ -23,6 +23,8 @@ import {
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import Picker, { SKIN_TONE_MEDIUM_DARK } from 'emoji-picker-react';
 import { io } from 'socket.io-client';
+import ShowLoader from 'ui-component/custom/Loader';
+import moment from 'moment/moment';
 
 // project imports
 import UserDetails from './UserDetails';
@@ -64,9 +66,12 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({
 
 const ChatMainPage = () => {
     const userId = parseInt(window.localStorage.getItem('id'));
+    const user = JSON.parse(window.localStorage.getItem('user'));
+    const [lastIndexOf, setLastIndexOf] = useState(-1);
+    const [isLoading, setIsLoading] = useState(Boolean(false));
+    // const socket = io('https://env-0216910.cloudjiffy.net');
+    const socket = io('http://localhost:3000/');
 
-    console.log();
-    const socket = io('http://localhost:3000');
     const theme = useTheme();
     const matchDownSM = useMediaQuery(theme.breakpoints.down('lg'));
 
@@ -77,34 +82,40 @@ const ChatMainPage = () => {
     const handleUserChange = () => {
         setEmailDetails((prev) => !prev);
     };
-
-    // toggle sidebar
-    const [openChatDrawer, setOpenChatDrawer] = React.useState(false);
-    const handleDrawerOpen = () => {
-        setOpenChatDrawer((prevState) => !prevState);
-    };
-
-    // close sidebar when widow size below 'md' breakpoint
-    React.useEffect(() => {
-        setOpenChatDrawer(!matchDownSM);
-    }, [matchDownSM]);
-
-    const [data, setData] = React.useState([]);
     const [messages, setMessages] = React.useState([]);
 
     React.useEffect(() => {
+        setIsLoading(true);
         socket.emit('findAllMessages', {}, (response) => {
             setMessages(response);
+            setIsLoading(false);
         });
+
         socket.on('message', (newMessage) => {
-            setMessages((old) => [...old, newMessage]);
+            if (newMessage.UserInfo.id === user.id) {
+                return;
+            } else {
+                setMessages((old) => old.concat({ ...newMessage }));
+            }
         });
     }, []);
 
     // handle new message form
     const [message, setMessage] = useState('');
     const handleOnSend = () => {
-        socket.emit('createMessage', { message, id: userId }, (r) => {
+        if (message == '') {
+            return;
+        }
+        setMessages((old) =>
+            old.concat({
+                id: user.id,
+                text: message,
+                created_at: moment(Date.now()).format('LLL'),
+                UserInfo: { id: user.id, first_name: user.first_name, last_name: user.last_name }
+            })
+        );
+        setMessage('');
+        socket.emit('createMessage', { message, id: user.id }, (r) => {
             setMessage('');
         });
     };
@@ -136,6 +147,8 @@ const ChatMainPage = () => {
 
     return (
         <Box sx={{ display: 'flex' }}>
+            <ShowLoader isLoading={isLoading} />
+
             <Main theme={theme}>
                 <Grid container spacing={gridSpacing}>
                     <Grid item xs zeroMinWidth sx={{ display: emailDetails ? { xs: 'none', sm: 'flex' } : 'flex' }}>
@@ -160,15 +173,10 @@ const ChatMainPage = () => {
                                     <Divider sx={{ mt: theme.spacing(2) }} />
                                 </Grid>
                                 <PerfectScrollbar
-                                    style={{ width: '100%', height: 'calc(100vh - 440px)', overflowX: 'hidden', minHeight: 525 }}
+                                    style={{ width: '100%', height: 'calc(100vh - 400px)', overflowX: 'hidden', minHeight: 460 }}
                                 >
                                     <CardContent>
-                                        <ChartHistory
-                                            theme={theme}
-                                            handleUserDetails={handleUserChange}
-                                            handleDrawerOpen={handleDrawerOpen}
-                                            data={messages}
-                                        />
+                                        <ChartHistory theme={theme} data={messages} />
                                     </CardContent>
                                 </PerfectScrollbar>
                                 <Grid item xs={12}>

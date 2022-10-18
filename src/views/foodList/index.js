@@ -13,6 +13,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import useAuth from 'hooks/useAuth';
 import Card3 from '../../assets/images/cards/card-3.jpg';
 import axiosServices from 'utils/axios';
+import ShowLoader from 'ui-component/custom/Loader';
 
 const Today = dayjs(Date.now()).toISOString();
 
@@ -20,6 +21,7 @@ const FoodList = () => {
     const { id } = useParams();
     console.log(id);
     const [dateValue, setDateValue] = useState(Today);
+    const [isLoading, setIsLoading] = useState(Boolean(false));
 
     const { isLoggedIn, user, userId } = useAuth();
     const theme = useTheme();
@@ -36,21 +38,28 @@ const FoodList = () => {
     };
 
     useEffect(() => {
+        setIsLoading(true);
+
         axiosServices
             .get(`/foodlist/${id}/${dateValue}`)
             .then((r) => {
                 setFoodItems(r.data);
+                setIsLoading(false);
             })
             .catch((err) => {
                 console.log(err);
+                setIsLoading(false);
             });
         return () => {
             console.log('this iwas ');
+            setIsLoading(false);
         };
     }, []);
 
     return (
         <>
+            <ShowLoader isLoading={isLoading} />
+
             <Grid container direction="row" justifyContent="space-between" alignItems="center" sx={{ paddingBottom: 6 }}>
                 {foodItems.length > 0 ? (
                     <>

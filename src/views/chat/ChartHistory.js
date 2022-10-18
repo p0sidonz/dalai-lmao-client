@@ -11,8 +11,7 @@ import { gridSpacing } from 'store/constant';
 // ==============================|| CHAT MESSAGE HISTORY ||============================== //
 
 const ChartHistory = ({ data, theme }) => {
-    const { user } = useAuth();
-    console.log(data, theme);
+    const user = JSON.parse(window.localStorage.getItem('user'));
     // scroll to bottom when new message is sent or received
     const wrapper = useRef(document.createElement('div'));
     const el = wrapper.current;

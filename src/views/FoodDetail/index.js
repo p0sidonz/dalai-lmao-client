@@ -8,6 +8,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 
 import { Typography, Card, CardMedia, CardContent, Grid, CardActions, Stack, Rating, Button } from '@mui/material';
 import SubCard from 'ui-component/cards/SubCard';
+import ShowLoader from 'ui-component/custom/Loader';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -24,6 +25,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const FoodDetail = () => {
     const dispatch = useDispatch();
+    const [isLoading, setIsLoading] = useState(Boolean(false));
+
     const { id } = useParams();
     const { isLoggedIn, user } = useAuth();
     const theme = useTheme();
@@ -47,13 +50,16 @@ const FoodDetail = () => {
     }
 
     async function fetchTheData() {
+        setIsLoading(true);
         await axiosServices
             .get(`/foodlist/detail/${parseInt(id)}`)
             .then((r) => {
                 setFooddetail([{ ...r.data }]);
                 setReviews(r.data.Reviews);
+                setIsLoading(false);
             })
             .catch((err) => {
+                setIsLoading(false);
                 console.log(err);
             });
     }
@@ -121,6 +127,8 @@ const FoodDetail = () => {
 
     return (
         <>
+            <ShowLoader isLoading={isLoading} />
+
             <Grid item xs={12} lg={4}>
                 {fooddetail.length > 0 ? (
                     <>

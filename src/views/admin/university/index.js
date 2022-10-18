@@ -10,6 +10,7 @@ import moment from 'moment';
 import EditMenuItem from './editMenuItem';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useDispatch } from 'react-redux';
+import ShowLoader from 'ui-component/custom/Loader';
 
 //  Edit Stuf
 import Dialog from '@mui/material/Dialog';
@@ -25,7 +26,7 @@ const UniversityAdmin = () => {
     const [menuEditItem, setMenuEditItem] = useState({});
     const [itemModalOpen, setItemModalOpen, toggleModal] = useModal();
     const [itemModalEditOpen, setItemModalEditOpen, toggleEditModal] = useModal();
-
+    const [isLoading, setIsLoading] = useState(Boolean(false));
     const [deleteId, setDeleteId] = useState();
 
     //  Delete
@@ -36,21 +37,25 @@ const UniversityAdmin = () => {
     };
 
     const fetchMenus = async () => {
+        setIsLoading(true);
         await axiosServices
             .get('/adminx/menulist')
             .then((res) => {
                 console.log(res);
                 setUniId(res.data.id);
                 setData([...res.data.UniversityMenu]);
+                setIsLoading(false);
             })
             .catch((error) => {
                 console.log(error);
+                setIsLoading(false);
             });
     };
     const handleClose = () => {
         setOpen(false);
     };
     const deleteMenuItem = () => {
+        setIsLoading(true);
         axiosServices
             .post('university-menu/delete', { menu_id: deleteId })
             .then((r) => {
@@ -68,6 +73,7 @@ const UniversityAdmin = () => {
                 );
                 fetchMenus();
                 handleClose();
+                setIsLoading(false);
             })
             .catch((err) => {
                 console.log(err);
@@ -82,6 +88,7 @@ const UniversityAdmin = () => {
                         close: true
                     })
                 );
+                setIsLoading(false);
             });
     };
 
@@ -127,6 +134,8 @@ const UniversityAdmin = () => {
     const a = null;
     return (
         <>
+            <ShowLoader isLoading={isLoading} />
+
             <MainCard
                 title="Menu List"
                 secondary={
@@ -150,7 +159,7 @@ const UniversityAdmin = () => {
                 title="Add New Menu"
                 closeText="Cancel"
             >
-                <AddNewMenu universityId={uniId} />
+                <AddNewMenu universityId={uniId} refetch={fetchMenus} setItemModalOpen={setItemModalOpen} />
             </CustomModal>
 
             <CustomModal

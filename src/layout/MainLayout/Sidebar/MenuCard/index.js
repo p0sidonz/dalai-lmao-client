@@ -22,6 +22,7 @@ import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 
 // styles
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
+    content: 'Loading',
     height: 10,
     borderRadius: 30,
     [`&.${linearProgressClasses.colorPrimary}`]: {

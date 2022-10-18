@@ -4,6 +4,7 @@
     "private": true,
     "dependencies": {
         "@auth0/auth0-spa-js": "^1.21.1",
+        "@capacitor/android": "^4.3.0",
         "@capacitor/cli": "^4.3.0",
         "@capacitor/core": "^4.3.0",
         "@emotion/cache": "^11.7.1",

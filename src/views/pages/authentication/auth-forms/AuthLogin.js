@@ -22,6 +22,7 @@ import {
 // third party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
+import ShowLoader from 'ui-component/custom/Loader';
 
 // project imports
 import AnimateButton from 'ui-component/extended/AnimateButton';
@@ -41,6 +42,7 @@ const JWTLogin = ({ loginProp, ...others }) => {
     const scriptedRef = useScriptRef();
 
     const [checked, setChecked] = React.useState(true);
+    const [isLoading, setIsLoading] = React.useState(Boolean(false));
 
     const [showPassword, setShowPassword] = React.useState(false);
     const handleClickShowPassword = () => {
@@ -52,132 +54,144 @@ const JWTLogin = ({ loginProp, ...others }) => {
     };
 
     return (
-        <Formik
-            initialValues={{
-                email: '',
-                password: '',
-                submit: null
-            }}
-            validationSchema={Yup.object().shape({
-                email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                password: Yup.string().max(255).required('Password is required')
-            })}
-            onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
-                try {
-                    await login(values.email, values.password);
+        <>
+            <Formik
+                initialValues={{
+                    email: '',
+                    password: '',
+                    submit: null
+                }}
+                validationSchema={Yup.object().shape({
+                    email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+                    password: Yup.string().max(255).required('Password is required')
+                })}
+                onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
+                    setIsLoading(true);
 
-                    if (scriptedRef.current) {
-                        setStatus({ success: true });
-                        setSubmitting(false);
+                    try {
+                        await login(values.email, values.password);
+
+                        if (scriptedRef.current) {
+                            setStatus({ success: true });
+                            setSubmitting(false);
+                            setIsLoading(false);
+                        }
+                    } catch (err) {
+                        setIsLoading(false);
+                        console.error(err);
+                        if (scriptedRef.current) {
+                            setStatus({ success: false });
+                            setErrors({ submit: err.message });
+                            setSubmitting(false);
+                            setIsLoading(false);
+                        }
                     }
-                } catch (err) {
-                    console.error(err);
-                    if (scriptedRef.current) {
-                        setStatus({ success: false });
-                        setErrors({ submit: err.message });
-                        setSubmitting(false);
-                    }
-                }
-            }}
-        >
-            {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
-                <form noValidate onSubmit={handleSubmit} {...others}>
-                    <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
-                        <InputLabel htmlFor="outlined-adornment-email-login">Email Address / Username</InputLabel>
-                        <OutlinedInput
-                            id="outlined-adornment-email-login"
-                            type="email"
-                            value={values.email}
-                            name="email"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            inputProps={{}}
-                        />
-                        {touched.email && errors.email && (
-                            <FormHelperText error id="standard-weight-helper-text-email-login">
-                                {errors.email}
-                            </FormHelperText>
-                        )}
-                    </FormControl>
-
-                    <FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ ...theme.typography.customInput }}>
-                        <InputLabel htmlFor="outlined-adornment-password-login">Password</InputLabel>
-                        <OutlinedInput
-                            id="outlined-adornment-password-login"
-                            type={showPassword ? 'text' : 'password'}
-                            value={values.password}
-                            name="password"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            endAdornment={
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={handleClickShowPassword}
-                                        onMouseDown={handleMouseDownPassword}
-                                        edge="end"
-                                        size="large"
-                                    >
-                                        {showPassword ? <Visibility /> : <VisibilityOff />}
-                                    </IconButton>
-                                </InputAdornment>
-                            }
-                            inputProps={{}}
-                            label="Password"
-                        />
-                        {touched.password && errors.password && (
-                            <FormHelperText error id="standard-weight-helper-text-password-login">
-                                {errors.password}
-                            </FormHelperText>
-                        )}
-                    </FormControl>
-
-                    <Grid container alignItems="center" justifyContent="space-between">
-                        <Grid item>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={checked}
-                                        onChange={(event) => setChecked(event.target.checked)}
-                                        name="checked"
-                                        color="primary"
-                                    />
-                                }
-                                label="Keep me logged in"
+                }}
+            >
+                {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
+                    <form noValidate onSubmit={handleSubmit} {...others}>
+                        <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
+                            <InputLabel htmlFor="outlined-adornment-email-login">Email Address / Username</InputLabel>
+                            <OutlinedInput
+                                id="outlined-adornment-email-login"
+                                type="email"
+                                value={values.email}
+                                name="email"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                inputProps={{}}
                             />
-                        </Grid>
-                        <Grid item>
-                            <Typography
-                                variant="subtitle1"
-                                component={Link}
-                                to={
-                                    loginProp
-                                        ? `/pages/forgot-password/forgot-password${loginProp}`
-                                        : '/pages/forgot-password/forgot-password3'
-                                }
-                                color="secondary"
-                                sx={{ textDecoration: 'none' }}
-                            >
-                                Forgot Password?
-                            </Typography>
-                        </Grid>
-                    </Grid>
+                            {touched.email && errors.email && (
+                                <FormHelperText error id="standard-weight-helper-text-email-login">
+                                    {errors.email}
+                                </FormHelperText>
+                            )}
+                        </FormControl>
 
-                    {errors.submit && (
-                        <Box sx={{ mt: 3 }}>
-                            <FormHelperText error>{errors.submit}</FormHelperText>
+                        <FormControl
+                            fullWidth
+                            error={Boolean(touched.password && errors.password)}
+                            sx={{ ...theme.typography.customInput }}
+                        >
+                            <InputLabel htmlFor="outlined-adornment-password-login">Password</InputLabel>
+                            <OutlinedInput
+                                id="outlined-adornment-password-login"
+                                type={showPassword ? 'text' : 'password'}
+                                value={values.password}
+                                name="password"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={handleClickShowPassword}
+                                            onMouseDown={handleMouseDownPassword}
+                                            edge="end"
+                                            size="large"
+                                        >
+                                            {showPassword ? <Visibility /> : <VisibilityOff />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
+                                inputProps={{}}
+                                label="Password"
+                            />
+                            {touched.password && errors.password && (
+                                <FormHelperText error id="standard-weight-helper-text-password-login">
+                                    {errors.password}
+                                </FormHelperText>
+                            )}
+                        </FormControl>
+
+                        <Grid container alignItems="center" justifyContent="space-between">
+                            <Grid item>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={checked}
+                                            onChange={(event) => setChecked(event.target.checked)}
+                                            name="checked"
+                                            color="primary"
+                                        />
+                                    }
+                                    label="Keep me logged in"
+                                />
+                            </Grid>
+                            <Grid item>
+                                {/* <Typography
+                                    variant="subtitle1"
+                                    component={Link}
+                                    to={
+                                        loginProp
+                                            ? `/pages/forgot-password/forgot-password${loginProp}`
+                                            : '/pages/forgot-password/forgot-password3'
+                                    }
+                                    color="secondary"
+                                    sx={{ textDecoration: 'none' }}
+                                >
+                                    Forgot Password?
+                                </Typography> */}
+                            </Grid>
+                        </Grid>
+
+                        {errors.submit && (
+                            <Box sx={{ mt: 3 }}>
+                                <FormHelperText error>{errors.submit}</FormHelperText>
+                            </Box>
+                        )}
+                        <Box sx={{ mt: 2 }}>
+                            <AnimateButton>
+                                <Button color="secondary" disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained">
+                                    Sign In
+                                </Button>
+                            </AnimateButton>
                         </Box>
-                    )}
-                    <Box sx={{ mt: 2 }}>
-                        <AnimateButton>
-                            <Button color="secondary" disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained">
-                                Sign In
-                            </Button>
-                        </AnimateButton>
-                    </Box>
-                </form>
-            )}
-        </Formik>
+                    </form>
+                )}
+            </Formik>
+            <ShowLoader isLoading={isLoading} />
+        </>
     );
 };
 

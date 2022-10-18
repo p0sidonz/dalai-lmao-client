@@ -12,11 +12,14 @@ import useAuth from 'hooks/useAuth';
 import Card3 from '../../assets/images/cards/card-3.jpg';
 import axiosServices from 'utils/axios';
 import FoodList from 'views/foodList';
+import ShowLoader from 'ui-component/custom/Loader';
 
 // ==============================|| SAMPLE PAGE ||============================== //
 
 const UniversityMenu = () => {
     const { isLoggedIn, user } = useAuth();
+    const [isLoading, setIsLoading] = useState(Boolean(false));
+
     const theme = useTheme();
     const [menuItems, setMenuItems] = useState([]);
     const cardStyle = {
@@ -26,21 +29,27 @@ const UniversityMenu = () => {
     };
 
     useEffect(() => {
+        setIsLoading(true);
         axiosServices
             .get(`/university-menu/`)
             .then((r) => {
                 setMenuItems(r.data.universityInfo.UniversityMenu);
+                setIsLoading(false);
             })
             .catch((err) => {
+                setIsLoading(false);
                 console.log(err);
             });
         return () => {
             console.log('this iwas ');
+            setIsLoading(false);
         };
     }, []);
 
     return (
         <>
+            <ShowLoader isLoading={isLoading} />
+
             <Grid item xs={12} lg={4}>
                 {menuItems.length > 0 ? (
                     <>

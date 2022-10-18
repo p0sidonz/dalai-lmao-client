@@ -39,6 +39,7 @@ import useScriptRef from 'hooks/useScriptRef';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axiosServices from 'utils/axios';
+import ShowLoader from 'ui-component/custom/Loader';
 
 // const useStyles = makeStyles((theme) => ({
 //     input: {
@@ -50,6 +51,8 @@ const ProfileSettings = () => {
     const { logout } = useAuth();
     const dispatch = useDispatch();
     const theme = useTheme();
+    const [isLoading, setIsLoading] = useState(Boolean(false));
+
     const [avatarImage, setAvatarImage] = useState('');
     const [userData, setUserData] = useState({});
     const [passwords, setPasswords] = useState({
@@ -64,6 +67,7 @@ const ProfileSettings = () => {
         setPasswords({ ...local });
     };
     const fileSelectedHandler = async (event) => {
+        setIsLoading(true);
         event.preventDefault();
         let input = event.target;
         let file = input.files[0];
@@ -87,9 +91,10 @@ const ProfileSettings = () => {
                             close: true
                         })
                     );
+                    setIsLoading(false);
                 })
                 .catch((err) => {
-                    console.log(err);
+                    setIsLoading(false);
                     dispatch(
                         openSnackbar({
                             open: true,
@@ -109,6 +114,8 @@ const ProfileSettings = () => {
     };
 
     const fetchProfile = async () => {
+        setIsLoading(true);
+
         await axiosServices
             .get(`/users/me`)
             .then((r) => {
@@ -120,8 +127,10 @@ const ProfileSettings = () => {
                     local.username = '';
                 }
                 setUserData({ ...local });
+                setIsLoading(false);
             })
             .catch((err) => {
+                setIsLoading(false);
                 console.log(err);
             });
     };
@@ -173,10 +182,11 @@ const ProfileSettings = () => {
                 })
             );
         }
-
+        setIsLoading(true);
         await axiosServices
             .post('/users/changePws', { ...passwords })
             .then((res) => {
+                setIsLoading(false);
                 dispatch(
                     openSnackbar({
                         open: true,
@@ -192,7 +202,7 @@ const ProfileSettings = () => {
                 setPasswords(local);
             })
             .catch((err) => {
-                console.log(err);
+                setIsLoading(false);
                 return dispatch(
                     openSnackbar({
                         open: true,
@@ -209,6 +219,7 @@ const ProfileSettings = () => {
 
     return (
         <>
+            <ShowLoader isLoading={isLoading} />
             <MainCard title="Profile" sx={{ marginBottom: 3 }}>
                 <Grid container spacing={3} justifyContent="center" alignItems="center">
                     <Grid item sx={{ marginBottom: 5 }}>
@@ -238,6 +249,7 @@ const ProfileSettings = () => {
                             contact: Yup.string().max(12).required('Contact is required')
                         })}
                         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
+                            setIsLoading(true);
                             delete values.avatar;
                             await axiosServices
                                 .post('users/update', { ...values })
@@ -253,6 +265,7 @@ const ProfileSettings = () => {
                                             close: true
                                         })
                                     );
+                                    setIsLoading(false);
                                 })
                                 .catch((err) => {
                                     dispatch(
@@ -266,6 +279,7 @@ const ProfileSettings = () => {
                                             close: true
                                         })
                                     );
+                                    setIsLoading(false);
                                 });
                         }}
                     >

@@ -14,7 +14,6 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 export default function SimpleBottomNavigation() {
     // const { user } = useAuth();
     const user = JSON.parse(window.localStorage.getItem('user'));
-    console.log(user);
     const [value, setValue] = React.useState(0);
 
     const menuItemStudent = [

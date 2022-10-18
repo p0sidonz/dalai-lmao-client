@@ -4,11 +4,12 @@
  */
 
 import axios from 'axios';
-const API_URL = process.env.REACT_APP_API_URL;
-console.log(`Your port is ${API_URL}`);
+// const API_URL = process.env.REACT_APP_API_URL;
+// console.log(`Your port is ${API_URL}`);
 
 const axiosServices = axios.create({
-    baseURL: process.env.REACT_APP_API_URL
+    // baseURL: 'https://env-0216910.cloudjiffy.net/'
+    baseURL: 'http://localhost:3000/'
 });
 
 // interceptor for http
