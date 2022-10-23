@@ -70,7 +70,7 @@ const AddNewMenu = ({ universityId, refetch, setItemModalOpen }) => {
                         validationSchema={Yup.object().shape({
                             name: Yup.string().max(255).required('Name field is required'),
                             description: Yup.string().max(255).required('description is required'),
-                            image: Yup.mixed().required()
+                            image: Yup.mixed().required('Image is required')
                         })}
                         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                             setIsLoading(true);

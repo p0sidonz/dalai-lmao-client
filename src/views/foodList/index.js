@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 
 import { Typography, Card, CardMedia, CardContent, Grid, CardActions, CardMe } from '@mui/material';
 import SubCard from 'ui-component/cards/SubCard';
@@ -15,8 +16,10 @@ import Card3 from '../../assets/images/cards/card-3.jpg';
 import axiosServices from 'utils/axios';
 import ShowLoader from 'ui-component/custom/Loader';
 
-const Today = dayjs(Date.now()).toISOString();
+dayjs.extend(utc);
 
+const Today = dayjs.utc().local().toISOString();
+console.log(Today);
 const FoodList = () => {
     const { id } = useParams();
     console.log(id);
@@ -66,7 +69,7 @@ const FoodList = () => {
                         {foodItems.map((item, index) => {
                             const x = null;
                             return (
-                                <Grid item lg={12} xs={6}>
+                                <Grid item lg={12} xs={6} key={index}>
                                     <MainCard
                                         content={false}
                                         boxShadow
@@ -80,7 +83,7 @@ const FoodList = () => {
                                     >
                                         <CardMedia
                                             sx={{ height: 220 }}
-                                            image="https://berrydashboard.io/static/media/prod-7.4fef88dc.jpg"
+                                            image={item.FoodDetail.image}
                                             title="Contemplative Reptile"
                                             component={Link}
                                             to={`/foodlist/detail/${item.id}`}

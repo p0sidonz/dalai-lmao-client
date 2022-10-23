@@ -108,19 +108,6 @@ export const JWTProvider = ({ children }) => {
                         close: true
                     })
                 );
-                if (response.data.role !== 'student') {
-                    doDispatch(
-                        openSnackbar({
-                            open: true,
-                            message: 'We advised you to login from desktop',
-                            variant: 'alert',
-                            alert: {
-                                color: 'success'
-                            },
-                            close: true
-                        })
-                    );
-                }
                 dispatch({
                     type: LOGIN,
                     payload: {

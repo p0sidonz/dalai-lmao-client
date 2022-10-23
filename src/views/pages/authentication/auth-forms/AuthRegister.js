@@ -168,7 +168,7 @@ const JWTRegister = ({ ...others }) => {
                                     error={Boolean(touched.firstName && errors.firstName)}
                                     sx={{ ...theme.typography.customInput }}
                                 >
-                                    <InputLabel htmlFor="outlined-adornment-email-firstName">Last Name</InputLabel>
+                                    <InputLabel htmlFor="outlined-adornment-email-firstName">First Name</InputLabel>
                                     <OutlinedInput
                                         id="outlined-adornment-email-firstName"
                                         type="email"

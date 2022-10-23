@@ -59,16 +59,20 @@ const UniversityMenu = () => {
                                 <Card key={index} sx={(cardStyle, { margin: 1 })}>
                                     <RouterLink to={`/foodlist/${item.id}`}>
                                         <CardMedia
-                                            image="https://post.healthline.com/wp-content/uploads/2021/10/fruit-salad-best-breakfast-foods-1296x728-body.jpg"
+                                            image={
+                                                item.image
+                                                    ? item.image
+                                                    : 'https://post.healthline.com/wp-content/uploads/2021/10/fruit-salad-best-breakfast-foods-1296x728-body.jpg'
+                                            }
                                             title={item.name}
                                         >
                                             <CardContent
-                                                sx={{ maxHeight: 100, color: theme.palette.common.white, backdropFilter: 'blur(3px)' }}
+                                                sx={{ maxHeight: 150, color: theme.palette.common.white, backdropFilter: 'blur(3px)' }}
                                             >
                                                 <Grid container spacing={1}>
                                                     <Grid item>
                                                         <Typography variant="h3" color="inherit">
-                                                            {item.name}
+                                                            {item.name.toUpperCase()}
                                                         </Typography>
                                                     </Grid>
                                                 </Grid>

@@ -34,23 +34,22 @@ const AddNewFood = ({ handleModal, fetchFoodList }) => {
     const dispatch = useDispatch();
     const theme = useTheme();
     const [menuImage, setMenuImage] = useState('');
-
-    // const fileSelectedHandler = async (event) => {
-    //     event.preventDefault();
-    //     let input = event.target;
-    //     let file = input.files[0];
-    //     let reader = new FileReader();
-    //     reader.addEventListener('load', async function () {
-    //         const RawBase64 = reader.result;
-    //         const base64 = reader.result.replace(/.*.base64,/, '');
-    //         const fieldID = input.id;
-    //         // setMenuImage(RawBase64);
-    //         return RawBase64;
-    //     });
-    //     if (file) {
-    //         reader.readAsDataURL(file);
-    //     }
-    // };
+    const fileSelectedHandler = async (event) => {
+        event.preventDefault();
+        let input = event.target;
+        let file = input.files[0];
+        let reader = new FileReader();
+        reader.addEventListener('load', async function () {
+            const RawBase64 = reader.result;
+            const base64 = reader.result.replace(/.*.base64,/, '');
+            const fieldID = input.id;
+            setMenuImage(RawBase64);
+            return RawBase64;
+        });
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    };
 
     // const returnTheImage = () => menuImage;
 
@@ -66,13 +65,13 @@ const AddNewFood = ({ handleModal, fetchFoodList }) => {
                         }}
                         validationSchema={Yup.object().shape({
                             name: Yup.string().max(255).required('Name field is required'),
-                            description: Yup.string().max(255).required('description is required')
-                            // image: Yup.mixed().required()
+                            description: Yup.string().max(255).required('description is required'),
+                            image: Yup.mixed().required('Image is required')
                         })}
                         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                             delete values.image;
                             await axiosServices
-                                .post('/adminx/addfood', { ...values })
+                                .post('/adminx/addfood', { ...values, image: menuImage })
                                 .then((r) => {
                                     console.log(r);
                                     dispatch(
@@ -147,7 +146,7 @@ const AddNewFood = ({ handleModal, fetchFoodList }) => {
                                     )}
                                 </FormControl>
 
-                                {/* <FormControl
+                                <FormControl
                                     sx={{ ...theme.typography.customInput }}
                                     fullWidth
                                     error={Boolean(touched.photo && errors.photo)}
@@ -178,7 +177,7 @@ const AddNewFood = ({ handleModal, fetchFoodList }) => {
                                     </>
                                 ) : (
                                     <></>
-                                )} */}
+                                )}
                                 <Button type="submit">Submit</Button>
                             </form>
                         )}
