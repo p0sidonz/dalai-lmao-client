@@ -19,10 +19,8 @@ import ShowLoader from 'ui-component/custom/Loader';
 dayjs.extend(utc);
 
 const Today = dayjs.utc().local().toISOString();
-console.log(Today);
 const FoodList = () => {
     const { id } = useParams();
-    console.log(id);
     const [dateValue, setDateValue] = useState(Today);
     const [isLoading, setIsLoading] = useState(Boolean(false));
 
@@ -54,7 +52,6 @@ const FoodList = () => {
                 setIsLoading(false);
             });
         return () => {
-            console.log('this iwas ');
             setIsLoading(false);
         };
     }, []);

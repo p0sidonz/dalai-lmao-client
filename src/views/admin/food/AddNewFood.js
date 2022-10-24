@@ -73,7 +73,6 @@ const AddNewFood = ({ handleModal, fetchFoodList }) => {
                             await axiosServices
                                 .post('/adminx/addfood', { ...values, image: menuImage })
                                 .then((r) => {
-                                    console.log(r);
                                     dispatch(
                                         openSnackbar({
                                             open: true,
@@ -88,7 +87,6 @@ const AddNewFood = ({ handleModal, fetchFoodList }) => {
                                     handleModal();
                                 })
                                 .catch((err) => {
-                                    console.log(err);
                                     dispatch(
                                         openSnackbar({
                                             open: true,

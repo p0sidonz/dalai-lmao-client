@@ -131,7 +131,6 @@ const ProfileSettings = () => {
             })
             .catch((err) => {
                 setIsLoading(false);
-                console.log(err);
             });
     };
     useEffect(() => {

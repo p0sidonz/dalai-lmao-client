@@ -76,7 +76,6 @@ const UniversityAdmin = () => {
                 setIsLoading(false);
             })
             .catch((err) => {
-                console.log(err);
                 dispatch(
                     openSnackbar({
                         open: true,

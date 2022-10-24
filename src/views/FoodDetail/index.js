@@ -83,7 +83,6 @@ const FoodDetail = () => {
         await axiosServices
             .get(`/foodlist/detail/${parseInt(id)}`)
             .then(async (r) => {
-                console.log(r);
                 setFooddetail([{ ...r.data.data }]);
                 setReviews(r.data.data.Reviews);
                 setIsDoneGreyed(r.data.reviewData);
@@ -91,14 +90,12 @@ const FoodDetail = () => {
             })
             .catch((err) => {
                 setIsLoading(false);
-                console.log(err);
             });
     }
 
     function giveRating(event) {
         const ratingValue = event.target.value;
 
-        console.log({ user_id: parseInt(user.id), point: parseInt(ratingValue), foodlist_id: parseInt(id) });
         if (!isDone) {
             axiosServices
                 .post('/review/add', {
@@ -177,7 +174,6 @@ const FoodDetail = () => {
                                         {!calculateRating() ? <>0</> : calculateRating()}
                                         /5
                                     </Typography>
-                                    {JSON.stringify(isDoneGreyed)}
                                     <Stack direction="row" alignItems="center" spacing={1}>
                                         <Rating
                                             style={{ pointerEvents: 'fill' }}

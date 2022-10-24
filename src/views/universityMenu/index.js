@@ -3,7 +3,7 @@ import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { Typography, Card, CardMedia, CardContent, Grid, CardActions } from '@mui/material';
+import { Typography, Card, CardMedia, CardContent, Grid, CardActions, Link } from '@mui/material';
 import SubCard from 'ui-component/cards/SubCard';
 
 // project imports
@@ -38,10 +38,8 @@ const UniversityMenu = () => {
             })
             .catch((err) => {
                 setIsLoading(false);
-                console.log(err);
             });
         return () => {
-            console.log('this iwas ');
             setIsLoading(false);
         };
     }, []);
@@ -50,14 +48,31 @@ const UniversityMenu = () => {
         <>
             <ShowLoader isLoading={isLoading} />
 
-            <Grid item xs={12} lg={4}>
+            <Grid item xs={12} lg={4} sx={{ paddingBottom: 5 }}>
+                {/* <Card sx={cardStyle}>
+                    <CardMedia
+                        image="https://post.healthline.com/wp-content/uploads/2021/10/fruit-salad-best-breakfast-foods-1296x728-body.jpg"
+                        title="Card 3"
+                    >
+                        <CardContent sx={{ maxHeight: 150, color: theme.palette.common.white, backdropFilter: 'blur(3px)' }}>
+                            <Grid container spacing={1}>
+                                <Grid item>
+                                    <Typography variant="h4" color="inherit">
+                                        Special title
+                                    </Typography>
+                                </Grid>
+                            </Grid>
+                        </CardContent>
+                    </CardMedia>
+                </Card> */}
+
                 {menuItems.length > 0 ? (
                     <>
                         {menuItems.map((item, index) => {
                             const x = null;
                             return (
                                 <Card key={index} sx={(cardStyle, { margin: 1 })}>
-                                    <RouterLink to={`/foodlist/${item.id}`}>
+                                    <Link color="inherit" href={`/foodlist/${item.id}`} underline="none">
                                         <CardMedia
                                             image={
                                                 item.image
@@ -71,7 +86,12 @@ const UniversityMenu = () => {
                                             >
                                                 <Grid container spacing={1}>
                                                     <Grid item>
-                                                        <Typography variant="h3" color="inherit">
+                                                        <Typography
+                                                            variant="h3"
+                                                            color="inherit"
+                                                            align="center"
+                                                            sx={{ textShadow: '0 0 3px #000000, 0 0 5px #000000' }}
+                                                        >
                                                             {item.name.toUpperCase()}
                                                         </Typography>
                                                     </Grid>
@@ -83,7 +103,7 @@ const UniversityMenu = () => {
                                                 </Grid>
                                             </CardActions>
                                         </CardMedia>
-                                    </RouterLink>
+                                    </Link>
                                 </Card>
                             );
                         })}
