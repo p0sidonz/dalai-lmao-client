@@ -178,8 +178,8 @@ const FoodDetail = () => {
                                         <Rating
                                             style={{ pointerEvents: 'fill' }}
                                             name="simple-controlled"
-                                            value={isDoneGreyed.point ? isDoneGreyed.point : 0}
-                                            disabled={Boolean(isDoneGreyed.point)}
+                                            value={isDoneGreyed?.point ? isDoneGreyed.point : 0}
+                                            disabled={Boolean(isDoneGreyed?.point)}
                                             icon={<StarTwoToneIcon fontSize="inherit" />}
                                             emptyIcon={<StarBorderTwoToneIcon fontSize="inherit" />}
                                             onChange={(event, newValue) => {

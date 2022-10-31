@@ -78,7 +78,6 @@ const AddNewMenu = ({ universityId, refetch, setItemModalOpen }) => {
                             await axiosServices
                                 .post('/university-menu/', { ...values, image: menuImage })
                                 .then((r) => {
-                                    console.log(r);
                                     refetch();
                                     dispatch(
                                         openSnackbar({
