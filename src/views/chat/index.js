@@ -69,7 +69,7 @@ const ChatMainPage = () => {
     const user = JSON.parse(window.localStorage.getItem('user'));
     const [lastIndexOf, setLastIndexOf] = useState(-1);
     const [isLoading, setIsLoading] = useState(Boolean(false));
-    const socket = io('http://env-2589.cloudjiffy.net');
+    const socket = io('https://api.mymess.in/');
     // const socket = io('http://localhost:3000/');
 
     const theme = useTheme();

@@ -8,7 +8,7 @@ import axios from 'axios';
 // console.log(`Your port is ${API_URL}`);
 
 const axiosServices = axios.create({
-    baseURL: 'https://env-2589.cloudjiffy.net/'
+    baseURL: 'https://api.mymess.in/'
     // baseURL: 'http://localhost:3000/'
 });
 

@@ -34,7 +34,7 @@ const FoodDetail = () => {
     const [fooddetail, setFooddetail] = useState([]);
     const [localReviewValue, setLocalReviewValue] = useState(0);
     const [reviews, setReviews] = useState([]);
-    const [isDone, setIsDone] = useState(false);
+    const [isDone, setIsDone] = useState(true);
     const [isDoneGreyed, setIsDoneGreyed] = useState({});
 
     const cardStyle = {
