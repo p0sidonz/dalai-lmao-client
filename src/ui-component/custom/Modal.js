@@ -22,11 +22,12 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     }
 }));
 
-function CustomModal({ fullWidth, title, handleClose, children, isActive, closeText, saveText, size, handleSave }) {
+function CustomModal({ fullWidth, title, handleClose, children, isActive, closeText, saveText, size, handleSave, saveColor, fullScreen }) {
     const [maxWidth, setMaxWidth] = useState(size ? size : 'lg');
     return (
         <div>
             <BootstrapDialog
+                fullScreen={fullScreen}
                 color="transparent"
                 sx={{ backdropFilter: 'blur(3px)' }}
                 onClose={handleClose}
@@ -48,9 +49,9 @@ function CustomModal({ fullWidth, title, handleClose, children, isActive, closeT
                         {closeText}
                     </Button>
 
-                    <Button autoFocus onClick={handleSave}>
+                    {saveText && <Button color={saveColor || 'primary'} autoFocus onClick={handleSave}>
                         {saveText}
-                    </Button>
+                    </Button>}
                 </DialogActions>
             </BootstrapDialog>
         </div>

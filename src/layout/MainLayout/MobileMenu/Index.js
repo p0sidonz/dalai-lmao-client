@@ -10,6 +10,7 @@ import ChatIcon from '@mui/icons-material/Chat';
 import MenuIcon from '@mui/icons-material/Menu';
 import useAuth from 'hooks/useAuth';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
+import SchoolIcon from '@mui/icons-material/School';
 
 export default function SimpleBottomNavigation() {
     // const { user } = useAuth();
@@ -18,13 +19,14 @@ export default function SimpleBottomNavigation() {
 
     const menuItemStudent = [
         { label: 'Menu', path: '/', role: 'student', icon: <HomeIcon /> },
-        { label: 'Chat', path: '/chat', role: 'student', icon: <ChatIcon /> },
+        // { label: 'Chat', path: '/chat', role: 'student', icon: <ChatIcon /> },
         { label: 'Settings', path: '/profile', role: 'student', icon: <MenuIcon /> }
     ];
 
     const menuItemUniversityOwner = [
         { label: 'University Menu', path: '/adminx', role: 'universityOwner', icon: <MenuBookIcon /> },
-        { label: 'Chat', path: '/chat', role: 'student', icon: <ChatIcon /> },
+        { label: 'Hostel', path: '/hostel', role: 'universityOwner', icon: <SchoolIcon /> },
+        // { label: 'Chat', path: '/chat', role: 'student', icon: <ChatIcon /> },
         { label: 'Settings', path: '/profile', role: 'student', icon: <MenuIcon /> }
     ];
 
@@ -32,12 +34,12 @@ export default function SimpleBottomNavigation() {
         switch (user.role) {
             case 'student':
                 return menuItemStudent.map((item, index) => (
-                    <BottomNavigationAction component={Link} to={item.path} label={item.label} icon={item.icon} />
+                    <BottomNavigationAction key={item.label} component={Link} to={item.path} label={item.label} icon={item.icon} />
                 ));
 
             case 'universityOwner':
                 return menuItemUniversityOwner.map((item, index) => (
-                    <BottomNavigationAction component={Link} to={item.path} label={item.label} icon={item.icon} />
+                    <BottomNavigationAction key={item.label} component={Link} to={item.path} label={item.label} icon={item.icon} />
                 ));
 
             default:
