@@ -19,7 +19,7 @@ const config = {
     borderRadius: 10,
     outlinedFilled: false,
     navType: 'light', // light, dark
-    presetColor: 'theme1', // default, theme1, theme2, theme3, theme4, theme5, theme6
+    presetColor: 'theme4', // default, theme1, theme2, theme3, theme4, theme5, theme6
     locale: 'en', // 'en' - English, 'fr' - French, 'ro' - Romanian, 'zh' - Chinese
     rtlLayout: false,
     container: true

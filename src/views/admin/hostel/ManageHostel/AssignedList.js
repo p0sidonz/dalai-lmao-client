@@ -16,8 +16,8 @@ import moment from 'moment/moment';
 const AssignedList = ({ title, studentData }) => {
     // table data for student
 
-    function createData(first_name, last_name, contact, email, created_at) {
-        return { first_name, last_name, contact, email, created_at };
+    function createData(first_name, last_name, contact, email, roomNo,created_at ) {
+        return { first_name, last_name, contact, email, roomNo,created_at };
     }
 
 
@@ -28,7 +28,8 @@ const AssignedList = ({ title, studentData }) => {
             User.last_name,
             User.contact,
             User.email,
-            User.created_at
+            User.roomNo,
+            User.created_at,
         );
     });
 
@@ -44,6 +45,7 @@ const AssignedList = ({ title, studentData }) => {
                             <TableCell sx={{ pl: 3 }}>Name</TableCell>
                             <TableCell align="right">Contact</TableCell>
                             <TableCell align="right">Email</TableCell>
+                            <TableCell align="right">Room No.</TableCell>
                             <TableCell align="right" sx={{ pr: 3 }}>
                                 Joined Date
                             </TableCell>
@@ -62,6 +64,8 @@ const AssignedList = ({ title, studentData }) => {
                                 </TableCell>
                                 <TableCell align="right">{row.contact || "-"}</TableCell>
                                 <TableCell align="right">{row.email}</TableCell>
+                                <TableCell align="right">{row.roomNo}</TableCell>
+
                                 <TableCell align="right">
                                     {moment(row.created_at).format('LLL')}
                                 </TableCell>

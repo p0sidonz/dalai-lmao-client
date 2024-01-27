@@ -7,6 +7,7 @@ import { useParams, Link } from 'react-router-dom';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useDispatch } from 'react-redux';
 import { useModal } from '../../../hooks/useModal';
+import { Card, CardContent, List, ListItem, ListItemText, Divider } from '@mui/material';
 
 // project imports
 import { gridSpacing } from 'store/constant';
@@ -19,6 +20,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import {
     Chip,
     Box,
+    Rating,
     Avatar,
     Button,
     Checkbox,
@@ -56,10 +58,11 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [menuImage, setMenuImage] = useState(menuEditItem.image);
     const [menuData, setMenuData] = useState({});
+    const [reviewsData, setReviewsData] = useState([]);
     const [foodList, setFoodList] = useState([]);
     const [existingData, setExistingData] = useState([]);
     const [isDateSet, setIsDateSet] = useState(false);
-    const [dateValue, setDateValue] = useState(dayjs('2022-10-12T21:11:54').toISOString());
+    const [dateValue, setDateValue] = useState(dayjs(Date.now()).toISOString());
     const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
     const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
@@ -82,6 +85,7 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
             .then((r) => {
                 const Final = r.data.map((item) => item.FoodDetail);
                 setExistingData([...Final]);
+                setReviewsData([...r.data]);
                 fetchFoodList();
             })
             .catch((err) => console.log('getFoodListOfMenu', err));
@@ -349,6 +353,7 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
                             <Grid item xs={12}>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DesktopDatePicker
+                                        defaultValue={"2024-10-12"}
                                         label="Date desktop"
                                         inputFormat="MM/DD/YYYY"
                                         value={dateValue}
@@ -412,14 +417,24 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
                                                 })
                                             }
                                         />
+                                        <Grid item>
+                                            <Typography variant="caption">Couldn't find the food? Just Add one from the right button.</Typography>
+                                        </Grid>
+                                        <div>
+                                            <h1>Reviews</h1>
+
+
+                                            <FoodReviews
+                                                food={foodList}
+                                                reviews={reviewsData}
+                                            />
+                                        </div>
                                     </>
                                 ) : (
                                     <></>
                                 )}
 
-                                <Grid item>
-                                    <Typography variant="caption">Couldn't find the food? Just Add one from the right button.</Typography>
-                                </Grid>
+
                             </Grid>
                         </Grid>
                     </SubCard>
@@ -439,4 +454,131 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
     );
 };
 
+const FoodReviews = ({ reviews }) => {
+    const [selectedFoodId, setSelectedFoodId] = useState(null);
+    const [foodReviews, setFoodReviews] = useState([]);
+
+    useEffect(() => {
+        // Function to filter reviews based on food ID
+        const getReviewsForFood = (foodId) => {
+            return reviews.find((foodReview) => foodReview.FoodDetail.id === foodId)?.Reviews || [];
+        };
+
+        // Get reviews for the selected food
+        if (selectedFoodId !== null) {
+            const reviewsForFood = getReviewsForFood(selectedFoodId);
+            setFoodReviews(reviewsForFood);
+        }
+    }, [selectedFoodId, reviews]);
+
+    // Extract unique reasons from all reviews
+    const allReasons = Array.from(
+        new Set(
+            reviews
+                .flatMap((foodReview) => foodReview.Reviews)
+                .filter((review) => review.reason) // Filter out reviews with undefined or null reason
+                .flatMap((review) => JSON.parse(review.reason))
+        )
+    );
+    // Extract unique reasons from reviews
+    const reasons = Array.from(
+        new Set(
+            foodReviews
+                .filter((review) => review.reason) // Filter out reviews with undefined or null reason
+                .flatMap((review) => JSON.parse(review.reason))
+        )
+    );
+    // Calculate overall reason counts
+    const overallReasonCounts = allReasons.reduce((counts, reason) => {
+        counts[reason] = reviews.reduce((total, foodReview) => {
+            const foodReviewReasonCounts = foodReview.Reviews.filter((review) =>
+                JSON.parse(review.reason).includes(reason)
+            ).length;
+            return total + foodReviewReasonCounts;
+        }, 0);
+        return counts;
+    }, {});
+
+    // Calculate reason counts
+    const reasonCounts = reasons.reduce((counts, reason) => {
+        counts[reason] = foodReviews.filter((review) =>
+            JSON.parse(review.reason).includes(reason)
+        ).length;
+        return counts;
+    }, {});
+
+    // Calculate total review count for the selected food
+    const totalReviewCountForSelectedFood =
+        selectedFoodId !== null
+            ? reviews.find((foodReview) => foodReview.FoodDetail.id === selectedFoodId)?.Reviews.length || 0
+            : 0;
+
+    // Calculate average rating for the selected food
+    const averageRatingForSelectedFood =
+        selectedFoodId !== null
+            ? foodReviews.reduce((sum, review) => sum + review.point, 0) / totalReviewCountForSelectedFood || 0
+            : 0;
+
+    return (
+        <Grid container spacing={3}>
+            <Grid item xs={6}>
+                <label>
+                    Select Food:
+                    <select
+                        value={selectedFoodId || ""}
+                        onChange={(e) => setSelectedFoodId(parseInt(e.target.value, 10) || null)}
+                    >
+                        <option value="">-- Select --</option>
+                        {reviews.map((foodReview) => (
+                            <option key={foodReview.FoodDetail.id} value={foodReview.FoodDetail.id}>
+                                {foodReview.FoodDetail.name}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+
+                {selectedFoodId !== null && (
+                    <div>
+                        <h2>Food Reviews for {reviews.find((foodReview) => foodReview.FoodDetail.id === selectedFoodId)?.FoodDetail.name}</h2>
+                        <p>Total Reviews: {totalReviewCountForSelectedFood}</p>
+
+                        {foodReviews.map((review) => (
+                            <div key={review.id}>
+                                <p>User: {review.UserInfo ? `${review.UserInfo.first_name} ${review.UserInfo.last_name}` : "N/A"}</p>
+                                <Box component="fieldset" borderColor="transparent">
+                                    <Rating name="read-only" value={review.point} readOnly />
+                                </Box>
+                                <p>Reasons: {review.reason ? JSON.parse(review.reason).join(", ") : "N/A"}</p>
+                                <p>Description: {review.description || "N/A"}</p>
+                                <hr />
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </Grid>
+
+            <Grid item xs={6}>
+                <p>Average Rating:
+                    <Box component="fieldset" borderColor="transparent">
+                        <Rating name="read-only" value={averageRatingForSelectedFood} readOnly />
+                    </Box>
+                </p>
+
+                <h3>Reason Counts:</h3>
+
+                <ul>
+                    {reasons.map((reason) => (
+                        <li key={reason}>
+                            {reason}: {reasonCounts[reason]}
+                        </li>
+                    ))}
+                </ul>
+            </Grid>
+        </Grid>
+    );
+};
 export default EditMenuItem;
+
+
+
+

@@ -11,6 +11,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import useAuth from 'hooks/useAuth';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SchoolIcon from '@mui/icons-material/School';
+import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 
 export default function SimpleBottomNavigation() {
     // const { user } = useAuth();
@@ -24,8 +26,8 @@ export default function SimpleBottomNavigation() {
     ];
 
     const menuItemUniversityOwner = [
-        { label: 'University Menu', path: '/adminx', role: 'universityOwner', icon: <MenuBookIcon /> },
-        { label: 'Hostel', path: '/hostel', role: 'universityOwner', icon: <SchoolIcon /> },
+        { label: 'University Menu', path: '/adminx', role: 'universityOwner', icon: <RestaurantMenuIcon /> },
+        { label: 'Hostel', path: '/hostel', role: 'universityOwner', icon: <DashboardIcon /> },
         // { label: 'Chat', path: '/chat', role: 'student', icon: <ChatIcon /> },
         { label: 'Settings', path: '/profile', role: 'student', icon: <MenuIcon /> }
     ];

@@ -3,7 +3,7 @@
 import PropTypes from 'prop-types';
 
 // material-ui
-import { Autocomplete, FormControl, InputLabel, Chip, useTheme, Select, MenuItem, Button, TextField, CardActions, Divider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Dialog, DialogTitle, DialogContent, DialogContentText, Typography, DialogActions, } from '@mui/material';
+import { Grid, LinearProgress, Autocomplete, FormControl, InputLabel, Chip, useTheme, Select, MenuItem, Button, TextField, CardActions, Divider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Dialog, DialogTitle, DialogContent, DialogContentText, Typography, DialogActions, } from '@mui/material';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -15,6 +15,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { DataGrid } from "@mui/x-data-grid";
 import CustomModal from 'ui-component/custom/Modal';
 import { useModal } from '../../../../hooks/useModal';
+import Chart from 'react-apexcharts';
 
 // =========================|| DATA WIDGET - APPLICATION SALES CARD ||========================= //
 
@@ -25,9 +26,11 @@ const PollingList = () => {
     const [selectedWorkerId, setSelectedWorkerId] = useState(null);
     const [selectedWorker, setSelectedWorker] = useState(null);
     const [itemModalOpen, setItemModalOpen, toggleModal] = useModal();
+    const [resultModalOpen, setResultModalOpen] = useState(false);
     const [workerModalOpen, setWorkerModalOpen] = useState(false)
-    const [showModal, setShowModal] = useState(false);
+    const [votesList, setVotesList] = useState([]);
 
+    const [showModal, setShowModal] = useState(false);
     const dispatch = useDispatch();
 
 
@@ -56,6 +59,20 @@ const PollingList = () => {
                     );
                     setIsLoading(false);
                 });
+    }
+
+
+
+
+    const fetchOnePolling = async (id) => {
+        return await axiosServices
+            .get(`/adminx/getOnePolling/${id}`)
+            .then((r) => {
+                setVotesList(r.data)
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     }
 
     const handleDeleteWorker = (e) => {
@@ -147,7 +164,18 @@ const PollingList = () => {
             headerName: "Actions",
             renderCell: (params) => (
                 <>
-
+                    <Button
+                        sx={{ mx: 1 }}
+                        variant="contained"
+                        color="success"
+                        onClick={() => {
+                            fetchOnePolling(params.row.id)
+                            setResultModalOpen(true)
+                        }
+                        }
+                    >
+                        View result
+                    </Button>
                     <Button
                         sx={{ mx: 1 }}
                         variant="contained"
@@ -293,16 +321,25 @@ const PollingList = () => {
         handleAddNewWorker={handleAddNewWorker}
         handleAddNew={handleAddNew}
         handleInputChange={handleInputChange}
+        resultModalOpen={resultModalOpen}
+        setResultModalOpen={setResultModalOpen}
+        votingData={votesList}
+
     />
 }
 
 
 
-const ListWorkerTable = ({ handleInputChange, handleAddNew, handleUpdateWorker, handleAddNewWorker, columns, setShowModal, showModal, title, workerList, loading, handleOnChangeHostel, itemModalOpen, handleDeleteWorker, setWorkerModalOpen, setItemModalOpen, setSelectedWorkerId, selectedWorkerId, selectedWorker, setSelectedWorker }) => {
+
+const ListWorkerTable = ({ votingData, resultModalOpen, setResultModalOpen, handleInputChange, handleAddNew, handleUpdateWorker, handleAddNewWorker, columns, setShowModal, showModal, title, workerList, loading, handleOnChangeHostel, itemModalOpen, handleDeleteWorker, setWorkerModalOpen, setItemModalOpen, setSelectedWorkerId, selectedWorkerId, selectedWorker, setSelectedWorker }) => {
     const theme = useTheme();
+    const [percentages, setPercentages] = useState([]);
     const handleCloseModal = () => {
         setShowModal(false);
     };
+
+
+
 
     // table data for student
     function createData(id, title, options, is_active, created_at) {
@@ -386,33 +423,6 @@ const ListWorkerTable = ({ handleInputChange, handleAddNew, handleUpdateWorker, 
                         onChange={handleInputChange}
                         value={selectedWorker?.options}
                     />
-                    {/* <TextField
-                        onChange={(e) => setSelectedWorker({ ...selectedWorker, email: e.target.value })}
-                        fullWidth
-                        id="email"
-                        label="Email"
-                        variant="outlined"
-                        margin="normal"
-                        defaultValue={selectedWorker?.email}
-                    />
-                    <TextField
-                        onChange={(e) => setSelectedWorker({ ...selectedWorker, phoneNumber: e.target.value })}
-                        fullWidth
-                        id="phoneNumber"
-                        label="Phone Number"
-                        variant="outlined"
-                        margin="normal"
-                        defaultValue={selectedWorker?.phoneNumber}
-                    />
-                    {selectedWorkerId?.id && <TextField
-                        fullWidth
-                        disabled
-                        id="id"
-                        label="id"
-                        variant="outlined"
-                        margin="normal"
-                        defaultValue={selectedWorker?.id}
-                    />} */}
 
 
                 </DialogContent>
@@ -445,12 +455,91 @@ const ListWorkerTable = ({ handleInputChange, handleAddNew, handleUpdateWorker, 
                 saveText="Delete"
                 saveColor="error"
                 handleSave={handleDeleteWorker}
-            />
+            >
+            </CustomModal>
+            <CustomModal
+                fullWidth={true}
+                size="md"
+                handleClose={() => setResultModalOpen(false)}
+                isActive={resultModalOpen}
+                title="Result"
+                closeText="Close"
+            >
+                <RenderVotes votingData={votingData} />
+            </CustomModal>
+
+
+
+
 
         </MainCard>
     );
 }
 
+
+
+
+
+const RenderVotes = ({ votingData }) => {
+
+    const [percentages, setPercentages] = useState([]);
+
+    // Calculate the percentage of votes for each option
+    const calculatePercentages = () => {
+        const optionCounts = votingData?.options?.reduce((counts, option) => {
+            counts[option] = votingData.Vote?.filter((vote) => vote.option === option)?.length;
+            return counts;
+        }, {});
+
+        const totalVotes = votingData.Vote?.length;
+
+        const percentages = votingData.options?.map((option) => ({
+            option,
+            percentage: ((optionCounts[option] || 0) / totalVotes) * 100,
+            votes: optionCounts[option] || 0, // New line to include the number of votes
+        }));
+        setPercentages(percentages)
+        return percentages;
+    };
+
+
+
+
+    useEffect(() => {
+        const percentages = calculatePercentages();
+        if (percentages) {
+            setPercentages(percentages);
+
+        }
+    }, [votingData.length]);
+
+
+
+    console.log(percentages, "percentagespercentagespercentagespercentages")
+    return (
+        <div>
+            {percentages?.map((data, index) => (
+                <div key={index}>
+                    <Grid item xs={12}>
+                        <Grid container alignItems="center" spacing={1}>
+                            <Grid item sm zeroMinWidth>
+                                <Typography variant="body2">{data.option}</Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="body2" align="right">
+                                    {`(${data.votes})`}       {`${data.percentage.toFixed(2)}%`}
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <LinearProgress variant="determinate" value={data.percentage.toFixed(2)} color="primary" />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </div>
+            ))}
+        </div>
+    );
+};
 
 
 

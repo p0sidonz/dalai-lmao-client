@@ -179,7 +179,16 @@ const ListServiceRequests = () => {
                 )
             }
         },
+        {
+            field: "userInfo", headerName: "Student", width: 200,
+            renderCell: (params) => {
+                return (<>
+                    <Typography sx={{ mr: 2 }} align="left" component="div">{`${params.row.userInfo?.first_name} ${params.row.userInfo?.last_name}`}</Typography>
+                    <Typography align="left" component="div"> {"("}{params.row.userInfo?.roomNo || "no room no."}{")"}</Typography>
+                </>)
+            }
 
+        },
         {
             width: 150,
             field: "serviceName",
@@ -188,7 +197,7 @@ const ListServiceRequests = () => {
         },
         {
             field: "hostelName",
-            headerName: "Hostel Name",
+            headerName: "Hostel",
             valueGetter: (params) => params.row.hostelName,
         },
         {

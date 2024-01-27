@@ -11,8 +11,12 @@ import PeopleIcon from '@mui/icons-material/People';
 import { useParams, Link } from 'react-router-dom';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import axiosServices from 'utils/axios';
+import LocalDrinkIcon from '@mui/icons-material/LocalDrink';
+import useWater from './useWater';
 
 const HostelMain = () => {
+
+    const { averages, isLoading } = useWater()
     const [count, setCounts] = React.useState();
     const theme = useTheme();
 
@@ -97,6 +101,15 @@ const HostelMain = () => {
                                 color={theme.palette.secondary.main}
                             />
                         </Link>
+                    </Grid>
+                    <Grid item xs={12} lg={6}>
+                        <RevenueCard
+                            primary="Water Quality"
+                            secondary={`Today: ${averages.today} | Week: ${averages.week} | Month: ${averages.month}`}
+                            content="(0 to 100 scale)"
+                            iconPrimary={LocalDrinkIcon}
+                            color={theme.palette.info.main}
+                        />
                     </Grid>
                 </Grid>
                 <Divider />

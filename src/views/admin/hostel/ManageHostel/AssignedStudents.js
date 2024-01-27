@@ -44,8 +44,8 @@ const AssignedStudents = ({ hostelId }) => {
     }, [hostelId])
 
 
-        function createData(first_name, last_name, contact, email, created_at) {
-        return { first_name, last_name, contact, email, created_at };
+        function createData(first_name, last_name, contact, email, created_at, roomNo) {
+        return { first_name, last_name, contact, email, created_at, roomNo };
     }
 
 
@@ -56,7 +56,8 @@ const AssignedStudents = ({ hostelId }) => {
             User.last_name,
             User.contact,
             User.email,
-            User.created_at
+            User.created_at,
+            User.roomNo
         );
     });
     return (
