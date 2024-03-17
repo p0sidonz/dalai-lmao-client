@@ -31,6 +31,8 @@ const ListServiceRequests = () => {
     const [showModal, setShowModal] = useState(false);
     const [servicesList, setServicesList] = useState([])
 
+
+
     const dispatch = useDispatch();
 
 
@@ -129,22 +131,6 @@ const ListServiceRequests = () => {
             });
     }
 
-
-    const handleRowClick = (event, row) => {
-        setIsLoading(true)
-        setSelectedWorkerId(row.id);
-        fetchWorkerData(row.id).then((hostel) => {
-            setSelectedWorker(hostel);
-            setIsLoading(false)
-            setShowModal(true)
-
-        }
-        ).catch((err) => {
-            setIsLoading(false)
-            console.log(err);
-        })
-
-    };
 
 
     const getChipColor = (status) => {
@@ -415,6 +401,7 @@ const ListWorkerTable = ({ servicesList, hostelList, handleAddNew, handleUpdateW
         setShowModal(false);
     };
 
+
     // table data for student
     function createData(id, description, created_at, hostelName, status, serviceName, userInfo, workerInfo) {
         return { id, description, created_at, hostelName, status, serviceName, userInfo, workerInfo };
@@ -435,6 +422,26 @@ const ListWorkerTable = ({ servicesList, hostelList, handleAddNew, handleUpdateW
         );
     });
 
+    const [selectedRequestId, setSelectedRequestId] = useState(null)
+    const [selectedRequest, setSelectedRequest] = useState(null)
+    const [requestModalOpen, setRequestModalOpen] = useState(false)
+    const [requestLoading, setRequestLoading] = useState(false)
+
+    const handleRequestModalOpen = () => {
+        setRequestModalOpen(true);
+    }
+
+    const handleRequestModalClose = () => {
+        setRequestModalOpen(false);
+    }
+
+
+    const handleRowClick = (event, row) => {
+        console.log("handleRowClick", event.row.description)
+        setSelectedRequest(event.row)
+        setRequestModalOpen(true)
+    };
+
 
     return (
 
@@ -452,6 +459,14 @@ const ListWorkerTable = ({ servicesList, hostelList, handleAddNew, handleUpdateW
 
             <div style={{ height: 500, width: '100%' }}>
                 <DataGrid
+                    onCellClick={handleRowClick}
+                    getRowHeight={({ id, densityFactor }) => {
+                        if (id % 2 === 0) {
+                            return 100 * densityFactor;
+                        }
+
+                        return null;
+                    }}
                     loading={loading}
                     rows={rows}
                     columns={columns}
@@ -558,6 +573,19 @@ const ListWorkerTable = ({ servicesList, hostelList, handleAddNew, handleUpdateW
                 saveColor="error"
                 handleSave={handleDeleteWorker}
             />
+
+            <CustomModal
+                handleClose={() => setRequestModalOpen(false)}
+                isActive={requestModalOpen}
+                title="Service Request"
+                closeText="close"
+                saveColor="error"
+                handleSave={handleDeleteWorker}
+            >
+                <Typography>
+                    <b>Issue:</b> {selectedRequest?.description}
+                </Typography>
+            </CustomModal>
 
         </MainCard>
     );
