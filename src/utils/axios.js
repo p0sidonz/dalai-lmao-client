@@ -9,7 +9,7 @@ import axios from 'axios';
 
 const axiosServices = axios.create({
     //  baseURL: 'https://api.mymess.in/'
-   baseURL: 'http://nestmymss.cap.fetch.fit:8000/'
+   baseURL:  'https://nestmymss.cap.fetch.fit:8000/'
 });
 
 // interceptor for http
