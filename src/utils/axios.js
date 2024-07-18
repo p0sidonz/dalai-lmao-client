@@ -8,8 +8,8 @@ import axios from 'axios';
 // console.log(`Your port is ${API_URL}`);
 
 const axiosServices = axios.create({
-    //  baseURL: 'https://api.mymess.in/'
-   baseURL:  'https://nestmymss.cap.fetch.fit:8000/'
+     baseURL: 'https://api.mymess.in/'
+//    baseURL:  'https://nestmymss.cap.fetch.fit:8000/'
 });
 
 // interceptor for http
