@@ -8,6 +8,9 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { useDispatch } from 'react-redux';
 import { useModal } from '../../../hooks/useModal';
 import { Card, CardContent, List, ListItem, ListItemText, Divider } from '@mui/material';
+import { Paper } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+
 
 // project imports
 import { gridSpacing } from 'store/constant';
@@ -114,68 +117,55 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
         }
     };
 
-    const handleOnChange = async (event, value, reason, details) => {
+    const handleOnChange = async (event, newValue) => {
         setIsLoaderLoading(true);
-        // console.log(details, value);
-        // setExistingData([...existingData, details.option]);
-        if (reason === 'selectOption') {
+        const addedItems = newValue.filter(item => !existingData.some(existing => existing.id === item.id));
+        const removedItems = existingData.filter(item => !newValue.some(newItem => newItem.id === item.id));
+    
+        for (const item of addedItems) {
             await axiosServices
                 .post('/foodlist', {
                     date: moment(dateValue).toISOString(true),
                     menu_id: menuEditItem.id,
-                    food_id: details.option.id
+                    food_id: item.id
                 })
-                .then((r) => {
-                    setIsLoaderLoading(false);
+                .then(() => {
                     dispatch(
                         openSnackbar({
                             open: true,
-                            message: 'Food Added',
+                            message: `${item.name} Added`,
                             variant: 'alert',
-                            alert: {
-                                color: 'success'
-                            },
+                            alert: { color: 'success' },
                             close: true
                         })
                     );
-                    toggleEditModal();
                 })
                 .catch((err) => {
-                    setIsLoaderLoading(false);
                     dispatch(
                         openSnackbar({
                             open: true,
                             message: err.data.message,
                             variant: 'alert',
-                            alert: {
-                                color: 'error'
-                            },
+                            alert: { color: 'error' },
                             close: true
                         })
                     );
                 });
         }
-        if (reason === 'removeOption') {
-            // let localData = existingData;
-            // let objIndex = localData.findIndex((obj) => obj.id === details.option.id);
-            // objIndex !== -1 && localData.splice(objIndex, 1);
-            // setExistingData(localData);
+    
+        for (const item of removedItems) {
             await axiosServices
-                .post('/foodlist/delete', { foodlist_id: details.option.id, menu_id: menuEditItem.id })
-                .then((r) => {
+                .post('/foodlist/delete', { foodlist_id: item.id, menu_id: menuEditItem.id })
+                .then(() => {
                     dispatch(
                         openSnackbar({
                             open: true,
-                            message: 'Food Removed',
+                            message: `${item.name} Removed`,
                             variant: 'alert',
-                            alert: {
-                                color: 'success'
-                            },
+                            alert: { color: 'success' },
                             close: true
                         })
                     );
-                    setIsLoaderLoading(false);
-                    toggleEditModal();
                 })
                 .catch((err) => {
                     dispatch(
@@ -183,17 +173,16 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
                             open: true,
                             message: err.data.message,
                             variant: 'alert',
-                            alert: {
-                                color: 'error'
-                            },
+                            alert: { color: 'error' },
                             close: true
                         })
                     );
-                    setIsLoaderLoading(false);
                 });
         }
+    
+        setExistingData(newValue);
+        setIsLoaderLoading(false);
     };
-
     const handleFoodChange = (newValue) => {
         setDateValue(dayjs(newValue).toISOString());
     };
@@ -202,6 +191,16 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
         fetchidk();
     };
     // const returnTheImage = () => menuImage;
+
+    const sortOptions = (options, value) => {
+        return options.sort((a, b) => {
+            const aSelected = value.some(item => item.id === a.id);
+            const bSelected = value.some(item => item.id === b.id);
+            if (aSelected && !bSelected) return -1;
+            if (!aSelected && bSelected) return 1;
+            return a.name.localeCompare(b.name);
+        });
+    };
 
     return (
         <>
@@ -378,45 +377,59 @@ const EditMenuItem = ({ menuEditItem, toggleEditModal, fetchMenus }) => {
 
                                 {!isLoading ? (
                                     <>
-                                        <Autocomplete
-                                            disabled={Boolean(!dateValue)}
-                                            id="combo-box-demo"
-                                            multiple
-                                            freeSolo
-                                            disableCloseOnSelect
-                                            value={existingData}
-                                            limitTags={2}
-                                            options={foodList}
-                                            onChange={handleOnChange}
-                                            getOptionLabel={(item) => (item.name ? item.name : '')}
-                                            getOptionSelected={(option, value) =>
-                                                value === undefined || value === '' || option.name === value.name
-                                            }
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    multiline={false}
-                                                    fullWidth
-                                                    label="Food listed for the above date"
-                                                    margin="normal"
-                                                    variant="outlined"
-                                                />
-                                            )}
-                                            renderTags={(value, getTagProps) =>
-                                                value.map((option, index) => {
-                                                    return (
-                                                        <Chip
-                                                            sx={{ fontWeight: '700' }}
-                                                            variant="contained"
-                                                            size="small"
-                                                            label={option.name}
-                                                            clickable={true}
-                                                            {...getTagProps({ index })}
-                                                        />
-                                                    );
-                                                })
-                                            }
-                                        />
+<Autocomplete
+        multiple
+        id="checkboxes-tags-demo"
+        options={sortOptions(foodList, existingData)}
+        disableCloseOnSelect
+        value={existingData}
+        onChange={handleOnChange}
+        getOptionLabel={(option) => option.name}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+        renderOption={(props, option, { selected }) => (
+            <li {...props}>
+                <Checkbox
+                    icon={icon}
+                    checkedIcon={checkedIcon}
+                    style={{ marginRight: 8 }}
+                    checked={selected}
+                />
+                {option.name}
+            </li>
+        )}
+        renderInput={(params) => (
+            <TextField
+                {...params}
+                label="Food Items"
+                placeholder="Select food items"
+                InputProps={{
+                    ...params.InputProps,
+                    startAdornment: (
+                        <>
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                            {params.InputProps.startAdornment}
+                        </>
+                    ),
+                }}
+            />
+        )}
+        PaperComponent={({ children }) => (
+            <Paper style={{ maxHeight: 400, overflowY: 'auto' }}>
+                {children}
+            </Paper>
+        )}
+        ListboxProps={{
+            style: {
+                maxHeight: 'calc(400px - 56px)', // Subtract the height of the search bar
+                overflowY: 'auto',
+            },
+        }}
+        sx={{ width: '100%', mt: 2 }}
+    />
+
+
                                         <Grid item>
                                             <Typography variant="caption">Couldn't find the food? Just Add one from the right button.</Typography>
                                         </Grid>

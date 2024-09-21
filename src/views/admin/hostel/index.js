@@ -102,7 +102,7 @@ const HostelMain = () => {
                             />
                         </Link>
                     </Grid>
-                    <Grid item xs={12} lg={6}>
+                    {/* <Grid item xs={12} lg={6}>
                         <RevenueCard
                             primary="Water Quality"
                             secondary={`Today: ${averages.today} | Week: ${averages.week} | Month: ${averages.month}`}
@@ -110,6 +110,18 @@ const HostelMain = () => {
                             iconPrimary={LocalDrinkIcon}
                             color={theme.palette.info.main}
                         />
+                    </Grid> */}
+                    
+                    <Grid item xs={12} lg={6}>
+                    <Link to="/water-coolers/list" style={{ textDecoration: 'none' }}>
+                        <RevenueCard
+                            primary="Water Coolers"
+                            secondary={`Manage Water coolers`}
+                            content="Manage Water coolers"
+                            iconPrimary={LocalDrinkIcon}
+                            color={theme.palette.info.main}
+                        />
+                         </Link>
                     </Grid>
                 </Grid>
                 <Divider />

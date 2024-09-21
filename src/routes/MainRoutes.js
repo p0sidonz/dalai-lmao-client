@@ -11,6 +11,7 @@ import ManageWorker from 'views/admin/hostel/ManageWorker';
 import ManageService from 'views/admin/hostel/ManageService/index'
 import Polling from 'views/admin/hostel/Polling';
 import ServiceRequests from 'views/admin/hostel/ServiceRequests';
+import ListWaterCooler from 'views/admin/hostel/WaterCooler/ListWaterCooler';
 
 // sample page routing
 const UniversityMenu = Loadable(lazy(() => import('views/universityMenu')));
@@ -87,6 +88,10 @@ const MainRoutes = {
         {
             path: '/service-requested/list',
             element: <ServiceRequests />
+        },
+        {
+            path: '/water-coolers/list',
+            element: <ListWaterCooler />
         }
     ]
 };

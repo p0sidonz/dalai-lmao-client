@@ -150,6 +150,19 @@ const ListServiceRequests = () => {
         fetchWorker()
     }, [])
 
+    const renameStatus = (status) => {
+        switch (status) {
+            case "pending":
+                return "Pending";
+            case "accepted":
+                return "Resolved";
+            case "rejected":
+                return "error";
+            default:
+                return "primary";
+        }
+    }
+
 
     const columns = [
         { field: "id", headerName: "ID", },
@@ -189,7 +202,7 @@ const ListServiceRequests = () => {
         {
             field: "status", headerName: "Status", width: 200,
             renderCell: (params) => {
-                return (<Chip color={getChipColor(params.row.status)} label={params.row.status} />)
+                return (<Chip color={getChipColor(params.row.status)} label={renameStatus(params.row.status)} />)
             }
         },
         {
@@ -390,17 +403,19 @@ const ListServiceRequests = () => {
         hostelList={hostelList}
         handleOnChangeHostel={handleOnChangeHostel}
         servicesList={servicesList}
+        fetchWorker={fetchWorker}
     />
 }
 
 
 
-const ListWorkerTable = ({ servicesList, hostelList, handleAddNew, handleUpdateWorker, handleAddNewWorker, columns, setShowModal, showModal, title, workerList, loading, handleOnChangeHostel, itemModalOpen, handleDeleteWorker, setWorkerModalOpen, setItemModalOpen, setSelectedWorkerId, selectedWorkerId, selectedWorker, setSelectedWorker }) => {
+const ListWorkerTable = ({ fetchWorker,servicesList, hostelList, handleAddNew, handleUpdateWorker, handleAddNewWorker, columns, setShowModal, showModal, title, workerList, loading, handleOnChangeHostel, itemModalOpen, handleDeleteWorker, setWorkerModalOpen, setItemModalOpen, setSelectedWorkerId, selectedWorkerId, selectedWorker, setSelectedWorker }) => {
     const theme = useTheme();
     const handleCloseModal = () => {
         setShowModal(false);
     };
 
+    const dispatch = useDispatch();
 
     // table data for student
     function createData(id, description, created_at, hostelName, status, serviceName, userInfo, workerInfo) {
@@ -442,6 +457,41 @@ const ListWorkerTable = ({ servicesList, hostelList, handleAddNew, handleUpdateW
         setRequestModalOpen(true)
     };
 
+    const handleMarkThisAsResolved = (id) => {
+        setRequestLoading(true)
+        axiosServices.get(`/adminx/markAsResolved/${selectedRequest.id}`)
+            .then((r) => {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: "Request marked as resolved",
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        close: true
+                    })
+                );
+                setRequestLoading(false)
+                fetchWorker()
+                setRequestModalOpen(false)
+            })
+            .catch((err) => {
+                console.log(err)
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: "Error marking request as resolved",
+                        variant: 'alert',
+                        alert: {
+                            color: 'error'
+                        },
+                        close: true
+                    })
+                );
+                setRequestLoading(false)
+            });
+    }
 
     return (
 
@@ -585,6 +635,10 @@ const ListWorkerTable = ({ servicesList, hostelList, handleAddNew, handleUpdateW
                 <Typography>
                     <b>Issue:</b> {selectedRequest?.description}
                 </Typography>
+
+               {selectedRequest?.status !== "accepted" &&  <Button sx={{mt: 2, mb: 2}}
+                variant='contained' color='primary'
+                onClick={handleMarkThisAsResolved}>Mark this Request as Resolved</Button>}
             </CustomModal>
 
         </MainCard>
